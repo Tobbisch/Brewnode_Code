@@ -1,0 +1,71 @@
+﻿TYPE "Digital_Sensor"
+VERSION : 0.1
+   STRUCT
+      Value : Real;   // Value of sensor
+      Status : Byte;   // Status. 1=OK
+      Address : Array[0..7] of Byte;   // Unique ID
+      Model : Byte;   // Type of sensor
+   END_STRUCT;
+
+END_TYPE
+
+TYPE "Analog_Sensor"
+VERSION : 0.1
+   STRUCT
+      Value : Int;   // Value of sensor
+      Status : Byte;   // Status. 1=OK
+      Model : Byte;   // Type of sensor
+   END_STRUCT;
+
+END_TYPE
+
+TYPE "DS18B20_Address"
+VERSION : 0.1
+   STRUCT
+      Address : Array[0..7] of Byte;
+   END_STRUCT;
+
+END_TYPE
+
+DATA_BLOCK "Brewnode_COM"
+{ S7_Optimized_Access := 'FALSE' }
+VERSION : 0.1
+NON_RETAIN
+   STRUCT 
+      Heartbeat_To_PLC : Bool;   // Heartbeat from Snap7 To PLC
+      Heartbeat_From_PLC : Bool;   // Heartbeat from PLC to Snap7
+      Digital_Sensors : Struct
+         Port1 { S7_SetPoint := 'False'} : Array[0..3] of "Digital_Sensor";
+         Port2 { S7_SetPoint := 'False'} : Array[0..3] of "Digital_Sensor";
+         Port3 { S7_SetPoint := 'False'} : Array[0..3] of "Digital_Sensor";
+         Port4 { S7_SetPoint := 'False'} : Array[0..3] of "Digital_Sensor";
+      END_STRUCT;
+      Analog_Sensors : Struct
+         Port5 { S7_SetPoint := 'False'} : "Analog_Sensor";
+         Port6 { S7_SetPoint := 'False'} : "Analog_Sensor";
+         Port7 { S7_SetPoint := 'False'} : "Analog_Sensor";
+         Port8 { S7_SetPoint := 'False'} : "Analog_Sensor";
+      END_STRUCT;
+      Digital_Inputs : Array[0..3] of Bool;
+      Relay : Array[0..4] of Bool;
+      Config : Struct
+         Detected : Struct
+            Port1 { S7_SetPoint := 'False'} : Array[0..3] of "DS18B20_Address";
+            Port2 { S7_SetPoint := 'False'} : Array[0..3] of "DS18B20_Address";
+            Port3 { S7_SetPoint := 'False'} : Array[0..3] of "DS18B20_Address";
+            Port4 { S7_SetPoint := 'False'} : Array[0..3] of "DS18B20_Address";
+         END_STRUCT;
+         Configured : Struct
+            Port1 { S7_SetPoint := 'False'} : Array[0..3] of "DS18B20_Address";
+            Port2 { S7_SetPoint := 'False'} : Array[0..3] of "DS18B20_Address";
+            Port3 { S7_SetPoint := 'False'} : Array[0..3] of "DS18B20_Address";
+            Port4 { S7_SetPoint := 'False'} : Array[0..3] of "DS18B20_Address";
+         END_STRUCT;
+      END_STRUCT;
+   END_STRUCT;
+
+
+BEGIN
+
+END_DATA_BLOCK
+
