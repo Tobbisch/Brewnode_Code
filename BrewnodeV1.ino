@@ -3,7 +3,7 @@
  *
  *  Created on: 16 aug. 2020
  *  Version: 1.2
- *  Modified: 31 mars 2021
+ *  Modified: 2 April 2021
  *      Author: Tobias Halldin
  */
 //----------------------------------------------------------------------
@@ -83,6 +83,7 @@ int numberOfDevices;
 DeviceAddress tempDeviceAddress;
 unsigned long previousMillis_PLC = 0;
 unsigned long previousMillis_PRC = 0;
+const String Version = "1.2"; //Version of code
 
 
 uint8_t OutputsEnable = 0x00; //Wait for this to be true from PLC, before setting outputs.
@@ -173,6 +174,11 @@ void setup() {
 
     // Open serial communications and wait for WIFI:
     Serial.begin(115200);
+
+    //Print the code version
+    Serial.print("--- Brewnode_Code Version: ");
+    Serial.print(Version);
+    Serial.println(" ---");
 
     //Fetch data from flash
     Fetch_Setup();
@@ -520,6 +526,9 @@ server.begin();
 /* Settings */
 String web_Settings(){
 	String tmp = "";
+	tmp += "<p>Brewnode_Code Version: ";
+	tmp += Version;
+	tmp += "</p>";
 	tmp += "<p>ID-Number: ";
 	tmp += Config.ID;
 	tmp += "</p>";
@@ -2184,22 +2193,26 @@ void loop()
 	unsigned long currentMillis = millis();
 
     //Connnect to PLC if not connected
-    while (!Client.Connected)
+    if (!Client.Connected)
     {
   	  Serial.println("Not connected");
       if (!Connect())
         delay(500);
     }
 
-  //Communicate with PLC if it's time
-  if (currentMillis - previousMillis_PLC >= PLC_COM_D) {
-      previousMillis_PLC = currentMillis;
-      Read_DB();
-      //Mirror Heartbeat
-      //Heartbeat mirrored and inverted in arduino. Mirrored in PLC
-      DB.Heartbeat_To_PLC = !DB.Heartbeat_From_PLC;
-      Write_DB();
-  }
+    // Only try to communicate if we are connected
+	if (Client.Connected){
+	  //Communicate with PLC if it's time
+		if (currentMillis - previousMillis_PLC >= PLC_COM_D) {
+			previousMillis_PLC = currentMillis;
+			Read_DB();
+			//Mirror Heartbeat
+			//Heartbeat mirrored and inverted in arduino. Mirrored in PLC
+			DB.Heartbeat_To_PLC = !DB.Heartbeat_From_PLC;
+			Write_DB();
+		}
+	}
+
 
   //Heartbeat watch and outputsenable
   Heartbeat_Watchdog(DB.Heartbeat_From_PLC);
